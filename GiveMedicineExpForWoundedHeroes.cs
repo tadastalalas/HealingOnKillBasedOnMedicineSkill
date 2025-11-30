@@ -37,13 +37,23 @@ namespace HealingOnKillBasedOnMedicineSkill
 
         private void GrantMedicineExpToHero(Hero hero, float expMultiplier = 1.0f)
         {
+            if (hero == null || Campaign.Current?.Models?.CharacterDevelopmentModel == null)
+                return;
+
             int medSkillThreshold = settings.MaxMedSkillThreshold;
             int retrievedCurrentMedSkill = hero.GetSkillValue(DefaultSkills.Medicine);
+
+            if (retrievedCurrentMedSkill < 0)
+                retrievedCurrentMedSkill = 0;
+
             int expNeededForFullMedLevel = Campaign.Current.Models.CharacterDevelopmentModel.GetXpAmountForSkillLevelChange(hero, DefaultSkills.Medicine, 1);
+
             if (retrievedCurrentMedSkill > medSkillThreshold)
                 retrievedCurrentMedSkill = medSkillThreshold;
+
             if (retrievedCurrentMedSkill == 0)
                 retrievedCurrentMedSkill = 1;
+
             float calculatedFloat = ((float)medSkillThreshold / (float)retrievedCurrentMedSkill) / (float)settings.ExpPercentageDivisor;
             float expToAdd = (expNeededForFullMedLevel * calculatedFloat) * expMultiplier;
             float percent = (expToAdd / expNeededForFullMedLevel) * 100;
